@@ -1,6 +1,7 @@
 package uk.co.dyadica.ev3api;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 /**
  * Created by dyadica.co.uk on 04/02/2016.
@@ -14,6 +15,7 @@ import android.os.AsyncTask;
 
 public class ExecuteCommand extends AsyncTask<Void, Void, Void>
 {
+    private static final String TAG = "ExecuteCommand";
     String command;
     Brick ev3;
 
@@ -90,7 +92,7 @@ public class ExecuteCommand extends AsyncTask<Void, Void, Void>
     @Override
     protected Void doInBackground(Void... params)
     {
-        System.out.println("Executing command: " + command);
+        Log.i(TAG, "Executing command: " + command);
 
         switch (command)
         {
@@ -115,12 +117,12 @@ public class ExecuteCommand extends AsyncTask<Void, Void, Void>
     {
         try
         {
-            System.out.println("Playing program: " + p1);
+            Log.i(TAG, "Playing program: " + p1);
             ev3.directCommand.loadProgramFromFullPath(p1);
         }
         catch (Exception ex)
         {
-            System.err.println("Failed to start program: " + ex.getMessage());
+            Log.e(TAG, "Failed to start program: " + ex.getMessage());
         }
     }
 
@@ -132,7 +134,7 @@ public class ExecuteCommand extends AsyncTask<Void, Void, Void>
         }
         catch (Exception ex)
         {
-            System.err.println("Failed to start audio: " + ex.getMessage());
+            Log.e(TAG, "Failed to start audio: " + ex.getMessage());
         }
     }
 
@@ -160,7 +162,7 @@ public class ExecuteCommand extends AsyncTask<Void, Void, Void>
         }
         catch (Exception ex)
         {
-            System.err.println("Failed to start audio: " + ex.getMessage());
+            Log.e(TAG, "Failed to start audio: " + ex.getMessage());
         }
     }
 
@@ -206,7 +208,7 @@ public class ExecuteCommand extends AsyncTask<Void, Void, Void>
         }
         catch (Exception ex)
         {
-            System.err.println("Failed to start audio: " + ex.getMessage());
+            Log.e(TAG, "Failed to start audio: " + ex.getMessage());
         }
     }
 
@@ -251,7 +253,7 @@ public class ExecuteCommand extends AsyncTask<Void, Void, Void>
         }
         catch (Exception ex)
         {
-            System.err.println("Failed to start audio: " + ex.getMessage());
+            Log.e(TAG, "Failed to start audio: " + ex.getMessage());
         }
     }
 
@@ -290,7 +292,7 @@ public class ExecuteCommand extends AsyncTask<Void, Void, Void>
         }
         catch (Exception ex)
         {
-            System.err.println("Failed to set pattern: " + ex.getMessage());
+            Log.e(TAG, "Failed to set pattern: " + ex.getMessage());
         }
     }
 }

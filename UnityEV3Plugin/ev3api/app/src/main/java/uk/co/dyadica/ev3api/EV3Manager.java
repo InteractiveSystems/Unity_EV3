@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.unity3d.player.UnityPlayer;
@@ -20,9 +21,9 @@ import com.unity3d.player.UnityPlayer;
 
 public class EV3Manager
 {
+    private static final String TAG = "EV3Manager";
     private static EV3Manager ev3Manager;
 
-    public static String scriptLocation = "EV3Manager";
     public static String deviceName = "EV3";
 
     private Context context;
@@ -181,7 +182,7 @@ public class EV3Manager
         if(ev3 == null)
             return;
 
-        System.out.println("Calling Play program: " + fileName);
+        Log.i(TAG, "Calling Play program: " + fileName);
 
         new ExecuteCommand(ev3, "play-program", fileName);
     }
@@ -204,7 +205,7 @@ public class EV3Manager
 
     public void  startDriveMotors(String portL, String portR, int s1, int s2)
     {
-        System.out.println("Motors: " + String.valueOf(s1) + "," + String.valueOf(s2) );
+        Log.i(TAG, "Motors: " + String.valueOf(s1) + "(" + portL +"), " + String.valueOf(s2) + "(" + portR +")" );
 
         if(ev3 == null)
             return;

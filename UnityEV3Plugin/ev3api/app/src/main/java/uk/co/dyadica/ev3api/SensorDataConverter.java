@@ -1,5 +1,7 @@
 package uk.co.dyadica.ev3api;
 
+import android.util.Log;
+
 import java.util.Arrays;
 
 import uk.co.dyadica.ev3api.EV3Types.*;
@@ -16,6 +18,8 @@ import uk.co.dyadica.ev3api.EV3Types.*;
 
 public class SensorDataConverter
 {
+    private static final String TAG = "SensorDataConverter";
+
     /**
      * Return the int value of the n bytes between firstByteIndex and lastByteIndex (inclusive)
      * These bytes must be in little endian representation
@@ -218,9 +222,9 @@ public class SensorDataConverter
         if(data == null)
             return;
 
-        System.out.print("Button Data" + " : ");
+        Log.d(TAG, "Button Data" + " : ");
         for (byte b : data)
-            System.out.print((b & 0xff) + " ");
-        System.out.println();
+            Log.d(TAG, (b & 0xff) + " ");
+        Log.d(TAG, "");
     }
 }

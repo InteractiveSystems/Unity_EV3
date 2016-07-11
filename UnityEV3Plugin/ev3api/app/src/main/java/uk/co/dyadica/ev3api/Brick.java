@@ -23,6 +23,7 @@ import uk.co.dyadica.ev3api.EV3Types.*;
 
 public class Brick extends AsyncTask<Void,Void,Void> implements IDataReceived
 {
+    private static final String TAG = "Brick";
     private EV3Manager ev3Manager;
 
     private Communication comm = null;
@@ -116,7 +117,7 @@ public class Brick extends AsyncTask<Void,Void,Void> implements IDataReceived
             }
             catch (ArgumentException e)
             {
-                System.err.println("Failed to poll brick ports");
+                Log.e(TAG, "Failed to poll brick ports");
             }
         }
 
@@ -135,7 +136,7 @@ public class Brick extends AsyncTask<Void,Void,Void> implements IDataReceived
         }
         catch (Exception ex)
         {
-            System.err.println("Poll Ports Error: " + ex.getMessage().toString());
+            Log.e(TAG, "Poll Ports Error: " + ex.getMessage().toString());
         }
 
         try
@@ -144,7 +145,7 @@ public class Brick extends AsyncTask<Void,Void,Void> implements IDataReceived
         }
         catch (Exception ex)
         {
-            System.err.println("Poll Buttons Error: " + ex.getMessage().toString());
+            Log.e(TAG, "Poll Buttons Error: " + ex.getMessage().toString());
         }
     }
 
@@ -355,7 +356,7 @@ public class Brick extends AsyncTask<Void,Void,Void> implements IDataReceived
         if (batchCommand != null)
             sendCommand(batchCommand, waitResponse);
         else
-            System.err.println("The batch command is not set");
+            Log.e(TAG, "The batch command is not set");
     }
 
     public void sendBatchCommand()

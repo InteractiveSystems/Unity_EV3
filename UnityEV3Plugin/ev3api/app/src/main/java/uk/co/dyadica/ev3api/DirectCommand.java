@@ -1,5 +1,7 @@
 package uk.co.dyadica.ev3api;
 
+import android.util.Log;
+
 import uk.co.dyadica.ev3api.EV3Types.*;
 
 /**
@@ -14,6 +16,7 @@ import uk.co.dyadica.ev3api.EV3Types.*;
 
 public class DirectCommand
 {
+    private static final String TAG = "DirectCommand";
     private final Brick brick;
 
     public DirectCommand(Brick brick)
@@ -30,6 +33,7 @@ public class DirectCommand
     public void startMotorAtPower(OutputPort port, int power) throws ArgumentException
     {
         startMotorAtPower(new OutputPort[]{port}, power);
+        Log.i(TAG, "startMotorAtPower: port-" + port.toString() + " power-" + power);
     }
 
     /**
@@ -616,7 +620,7 @@ public class DirectCommand
 
     public void setLedPattern(LedPattern ledPattern) throws ArgumentException
     {
-        System.out.println("Setting led to: " + ledPattern.toString());
+        Log.e(TAG, "Setting led to: " + ledPattern.toString());
 
         Command c = new Command(CommandType.DirectNoReply);
         c.setLedPattern(ledPattern);
@@ -635,10 +639,10 @@ public class DirectCommand
         if(data == null)
             return;
 
-        System.out.print("DC Data" + " : ");
+        Log.d(TAG, "DC Data" + " : ");
         for (byte b : data)
-            System.out.print((b & 0xff) + " ");
-        System.out.println();
+            Log.d(TAG, (b & 0xff) + " ");
+        Log.d(TAG,"");
     }
 
     public void stopProgram() throws ArgumentException

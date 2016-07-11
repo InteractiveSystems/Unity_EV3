@@ -20,6 +20,7 @@ import java.io.OutputStream;
 
 public class BluetoothClient extends AsyncTask<Void, String, Void>
 {
+    private static final String TAG = "BluetoothClient";
     IDataReceived callback;
 
     private final BluetoothSocket btSocket;
@@ -33,7 +34,7 @@ public class BluetoothClient extends AsyncTask<Void, String, Void>
     {
         this.brick = brick;
 
-        System.out.println("Initialising Bluetooth Client!");
+        Log.i(TAG, "Initialising Bluetooth Client!");
 
         // Set the final callback ref
         callback = listener;
@@ -56,13 +57,13 @@ public class BluetoothClient extends AsyncTask<Void, String, Void>
         }
         catch (IOException e)
         {
-            System.err.println("Failed to create streams!");
+            Log.e(TAG, "Failed to create streams!");
         }
 
         btInStream = tmpIn;
         btOutStream = tmpOut;
 
-        System.out.println("Bluetooth Client Initialised!");
+        Log.i(TAG, "Bluetooth Client Initialised!");
     }
 
     // region AsyncTask
@@ -89,11 +90,11 @@ public class BluetoothClient extends AsyncTask<Void, String, Void>
 
     private void loopReceiver()
     {
-        System.out.println("Initialising Bluetooth Receiver!");
+        Log.i(TAG, "Initialising Bluetooth Receiver!");
 
         while (btSocket.isConnected())
         {
-            // System.out.println("Looping Receiver!");
+            // Log.i(TAG, "Looping Receiver!");
 
             try
             {
@@ -111,7 +112,7 @@ public class BluetoothClient extends AsyncTask<Void, String, Void>
 
                     short msgLength = EndianConverter.swapToShort(data);
 
-                    // System.out.println("Message Length: " + msgLength);
+                    // Log.i(TAG, "StringID Length: " + msgLength);
 
                     byte[] byteData = new byte[msgLength - 2];
 
@@ -125,7 +126,7 @@ public class BluetoothClient extends AsyncTask<Void, String, Void>
             }
             catch (Exception ex)
             {
-                System.err.println("Failed to read data: " + ex.getMessage());
+                Log.e(TAG, "Failed to read data: " + ex.getMessage());
             }
         }
     }

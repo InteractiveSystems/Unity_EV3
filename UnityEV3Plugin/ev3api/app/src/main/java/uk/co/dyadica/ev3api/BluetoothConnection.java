@@ -21,6 +21,7 @@ import java.util.Set;
 
 public class BluetoothConnection extends Communication implements IConnected
 {
+    private static final String TAG = "BluetoothConnection";
     public BluetoothAdapter bluetoothAdapter;
     public Set<BluetoothDevice> pairedDevices;
 
@@ -40,7 +41,7 @@ public class BluetoothConnection extends Communication implements IConnected
         this.deviceName = deviceName;
         this.brick = brick;
 
-        System.out.println("Initialising Bluetooth Communication!");
+        Log.i(TAG, "Initialising Bluetooth Communication!");
     }
 
     // region Communication
@@ -54,7 +55,7 @@ public class BluetoothConnection extends Communication implements IConnected
         }
         catch (Exception ex)
         {
-            System.err.println("Failed to open bluetooth connection!");
+            Log.w(TAG, "Failed to open bluetooth connection!");
         }
     }
 
@@ -67,8 +68,8 @@ public class BluetoothConnection extends Communication implements IConnected
             {
                 bluetoothSocket.close();
 
-                System.out.println("Socket closed: " + bluetoothSocket.isConnected());
-                System.out.println("Wait complete end of connection!");
+                Log.i(TAG, "Socket closed: " + bluetoothSocket.isConnected());
+                Log.i(TAG, "Wait complete end of connection!");
 
                 try
                 {
@@ -76,12 +77,12 @@ public class BluetoothConnection extends Communication implements IConnected
                 }
                 catch (InterruptedException ex)
                 {
-                    System.err.println("Interrupted during disconnection : " + ex.getMessage());
+                    Log.e(TAG, "Interrupted during disconnection : " + ex.getMessage());
                 }
             }
             catch (Exception e)
             {
-                System.err.println("Error during disconnection : " + e.getMessage());
+                Log.e(TAG, "Error during disconnection : " + e.getMessage());
             }
         }
     }
@@ -95,7 +96,7 @@ public class BluetoothConnection extends Communication implements IConnected
         }
         catch (Exception e)
         {
-            System.err.println("Error to write bytes : " + e.getMessage());
+            Log.e(TAG, "Error to write bytes : " + e.getMessage());
             return false;
         }
     }
@@ -144,7 +145,7 @@ public class BluetoothConnection extends Communication implements IConnected
         {
             callback = params[0];
 
-            System.out.println("Opening Bluetooth Connection!");
+            Log.i(TAG, "Opening Bluetooth Connection!");
 
             // Simple Bluetooth test
 
@@ -157,7 +158,7 @@ public class BluetoothConnection extends Communication implements IConnected
 
             // Check for paired devices
 
-            System.out.println("Checking for paired devices!");
+            Log.i(TAG, "Checking for paired devices!");
 
             pairedDevices = bluetoothAdapter.getBondedDevices();
 
@@ -168,7 +169,7 @@ public class BluetoothConnection extends Communication implements IConnected
 
             // Check to see if the named device exists
 
-            System.out.println("Checking to see if the named device exists!");
+            Log.i(TAG, "Checking to see if the named device exists!");
 
             for (BluetoothDevice device : pairedDevices)
             {
@@ -183,7 +184,7 @@ public class BluetoothConnection extends Communication implements IConnected
             if(bluetoothDevice == null)
                 return null;
 
-            System.out.println("The named device exists!");
+            Log.i(TAG, "The named device exists!");
 
             // Initialise the connection
             // Set the socket etc here!
@@ -199,7 +200,7 @@ public class BluetoothConnection extends Communication implements IConnected
             }
             catch (IOException e)
             {
-                System.err.println("Failed to create RfcommSocketToServiceRecord socket");
+                Log.e(TAG, "Failed to create RfcommSocketToServiceRecord socket");
                 return null;
             }
 
@@ -211,11 +212,11 @@ public class BluetoothConnection extends Communication implements IConnected
             }
             catch (Exception ex)
             {
-                System.err.println("Failed to connect to socket!");
+                Log.w(TAG, "Failed to connect to socket!");
                 return null;
             }
 
-            System.out.println("Connected to device: " + deviceName);
+            Log.i(TAG, "Connected to device: " + deviceName);
 
             return bluetoothSocket;
         }

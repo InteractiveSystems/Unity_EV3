@@ -1,5 +1,6 @@
 package uk.co.dyadica.ev3api;
 
+import android.util.Log;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,7 @@ import uk.co.dyadica.ev3api.EV3Types.*;
 
 public class ResponseManager
 {
+    private static final String TAG = "ResponseManager";
     private static int nextSequence = 0x0001;
     private static final Map<Integer, Response> responses = new HashMap<>();
 
@@ -65,7 +67,7 @@ public class ResponseManager
                 else
                     response.replyType = ReplyType.DirectReplyError;
             } catch (InterruptedException e) {
-                System.err.println(e.getMessage());
+                Log.e(TAG, e.getMessage());
             }
         else
             new waitResponseThreadAsync(response).start();
