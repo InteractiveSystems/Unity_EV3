@@ -1,10 +1,7 @@
 package uk.co.dyadica.ev3api;
 
-import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.unity3d.player.UnityPlayer;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -79,7 +76,7 @@ public class Brick extends AsyncTask<Void,Void,Void> implements IDataReceived
 
         for(BrickButton ev3Button : BrickButton.values())
         {
-            ev3Buttons.put(ev3Button,new EV3Button(ev3Button.toString(), ev3Button, index++));
+            ev3Buttons.put(ev3Button, new EV3Button(ev3Button.toString(), ev3Button, index++));
         }
 
         // this.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -95,13 +92,11 @@ public class Brick extends AsyncTask<Void,Void,Void> implements IDataReceived
         comm.close();
     }
 
-    public void bluetoothConnected()
+    public void bluetoothConnected(boolean connectionState)
     {
-        isConnected = true;
+        isConnected = connectionState;
 
-        ev3Manager.sendMessage("throwBluetoothConnection", "true");
-
-        this.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        UnityMessage.throwBluetoothConnected(connectionState);
     }
 
     // region AsyncTask
@@ -161,53 +156,15 @@ public class Brick extends AsyncTask<Void,Void,Void> implements IDataReceived
 
         // region Button Check
 
-        if(ev3Buttons.get(BrickButton.Up).pressed != (buttons[0] == 1))
+        for (EV3Button buttonState : ev3Buttons.values())
         {
-            ev3Buttons.get(BrickButton.Up).pressed = (buttons[0] == 1);
-            // System.out.println("Button.Up: " + (String.valueOf(ev3Buttons.get(BrickButton.Up).pressed)));
-            ev3Manager.sendMessage("throwButtonUpdate", "Up," + ev3Buttons.get(BrickButton.Up).pressed);
-        }
+            boolean isPressed = buttons[buttonState.index] == 1;
 
-        if(ev3Buttons.get(BrickButton.Enter).pressed != (buttons[1] == 1))
-        {
-            ev3Buttons.get(BrickButton.Enter).pressed = (buttons[1] == 1);
-            // System.out.println("Button.Enter: " + (String.valueOf(ev3Buttons.get(BrickButton.Enter).pressed)));
-            ev3Manager.sendMessage("throwButtonUpdate", "Enter," + ev3Buttons.get(BrickButton.Enter).pressed);
-        }
-
-        if(ev3Buttons.get(BrickButton.Down).pressed != (buttons[2] == 1))
-        {
-            ev3Buttons.get(BrickButton.Down).pressed = (buttons[2] == 1);
-            // System.out.println("Button.Down: " + (String.valueOf(ev3Buttons.get(BrickButton.Down).pressed)));
-            ev3Manager.sendMessage("throwButtonUpdate", "Down," + ev3Buttons.get(BrickButton.Down).pressed);
-        }
-
-        if(ev3Buttons.get(BrickButton.Right).pressed != (buttons[3] == 1))
-        {
-            ev3Buttons.get(BrickButton.Right).pressed = (buttons[3] == 1);
-            // System.out.println("Button.Right: " + (String.valueOf(ev3Buttons.get(BrickButton.Right).pressed)));
-            ev3Manager.sendMessage("throwButtonUpdate", "Right," + ev3Buttons.get(BrickButton.Right).pressed);
-        }
-
-        if(ev3Buttons.get(BrickButton.Left).pressed != (buttons[4] == 1))
-        {
-            ev3Buttons.get(BrickButton.Left).pressed = (buttons[4] == 1);
-            // System.out.println("Button.Left: " + (String.valueOf(ev3Buttons.get(BrickButton.Left).pressed)));
-            ev3Manager.sendMessage("throwButtonUpdate", "Left," + ev3Buttons.get(BrickButton.Left).pressed);
-        }
-
-        if(ev3Buttons.get(BrickButton.Back).pressed != (buttons[5] == 1))
-        {
-            ev3Buttons.get(BrickButton.Back).pressed = (buttons[5] == 1);
-            // System.out.println("Button.Back: " + (String.valueOf(ev3Buttons.get(BrickButton.Back).pressed)));
-            ev3Manager.sendMessage("throwButtonUpdate", "Back," + ev3Buttons.get(BrickButton.Back).pressed);
-        }
-
-        if(ev3Buttons.get(BrickButton.Any).pressed != (buttons[6] == 1))
-        {
-            ev3Buttons.get(BrickButton.Any).pressed = (buttons[6] == 1);
-            // System.out.println("Button.Any: " + (String.valueOf(ev3Buttons.get(BrickButton.Any).pressed)));
-            ev3Manager.sendMessage("throwButtonUpdate", "Any," + ev3Buttons.get(BrickButton.Any).pressed);
+            if (buttonState.pressed != isPressed)
+            {
+                buttonState.pressed = isPressed;
+                UnityMessage.throwButtonUpdate(buttonState);
+            }
         }
     }
 
@@ -227,7 +184,7 @@ public class Brick extends AsyncTask<Void,Void,Void> implements IDataReceived
 
                 String portDeviceUpdate = inputPort.name() + "," + dt.toString();
 
-                ev3Manager.sendMessage("throwPortDeviceUpdate", portDeviceUpdate);
+                ev3Manager.UnityMessageTemp("throwPortDeviceUpdate", portDeviceUpdate);
             }
 
             ports.get(inputPort).deviceType =
@@ -245,46 +202,30 @@ public class Brick extends AsyncTask<Void,Void,Void> implements IDataReceived
             DeviceType dt = ports.get(inputPort).deviceType;
 
             // Update the whole port
-
-            ports.get(inputPort).port =
-                    directCommand.getPortState(ports.get(inputPort));
+            ports.get(inputPort).port = directCommand.getPortState(ports.get(inputPort));
 
             // Update the port to reflect (long-winded!)
-
-            ports.get(inputPort).deviceType =
-                    ports.get(inputPort).port.deviceType;
-
-            ports.get(inputPort).rawValue =
-                    ports.get(inputPort).port.rawValue;
-
-            ports.get(inputPort).SIValue =
-                    ports.get(inputPort).port.SIValue;
-
-            ports.get(inputPort).percentValue =
-                    ports.get(inputPort).port.percentValue;
-
-            ports.get(inputPort).mode =
-                    ports.get(inputPort).port.mode;
+            ports.get(inputPort).deviceType = ports.get(inputPort).port.deviceType;
+            ports.get(inputPort).rawValue = ports.get(inputPort).port.rawValue;
+            ports.get(inputPort).SIValue =  ports.get(inputPort).port.SIValue;
+            ports.get(inputPort).percentValue =  ports.get(inputPort).port.percentValue;
+            ports.get(inputPort).mode = ports.get(inputPort).port.mode;
 
             // Convert values to strings for sending to unity
-
             String di = ports.get(inputPort).deviceType.toString();
-            String dm = String.valueOf(((int) ports.get(inputPort).mode));
-
+            String dm = String.valueOf((int) ports.get(inputPort).mode);
             String dr = String.valueOf(ports.get(inputPort).rawValue);
             String ds = String.valueOf(ports.get(inputPort).SIValue);
             String dp = String.valueOf(ports.get(inputPort).percentValue);
 
             // Throw a port connection or device update
-
             if (dt != ports.get(inputPort).deviceType)
             {
                 String portDeviceUpdate = inputPort.name() + "," + di;
-                ev3Manager.sendMessage("throwPortDeviceUpdate", portDeviceUpdate);
-            }
+                UnityMessage.throwPortDeviceUpdate(portDeviceUpdate);
+             }
 
             // Throw an input device update event
-
             if(ports.get(inputPort).deviceType != DeviceType.Empty &&
                     ports.get(inputPort).deviceType != DeviceType.Unknown &&
                     ports.get(inputPort).deviceType != DeviceType.WrongPort &&
@@ -299,14 +240,12 @@ public class Brick extends AsyncTask<Void,Void,Void> implements IDataReceived
                         + ds + ","
                         + dp;
 
-                ev3Manager.sendMessage("throwPortSensorUpdate", portSensorUpdate);
+                UnityMessage.throwPortSensorUpdate(portSensorUpdate);
             }
         }
 
         /*
-        ports.get(InputPort.One).port =
-                directCommand.getPortState(ports.get(InputPort.One));
-
+        ports.get(InputPort.One).port = directCommand.getPortState(ports.get(InputPort.One));
         System.out.println(ports.get(InputPort.One).port.deviceType);
         */
     }

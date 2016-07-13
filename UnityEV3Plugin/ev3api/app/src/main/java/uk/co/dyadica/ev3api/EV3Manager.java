@@ -19,7 +19,7 @@ import com.unity3d.player.UnityPlayer;
  * <p/>
  */
 
-public class EV3Manager
+public class EV3Manager implements UnityCalls
 {
     private static final String TAG = "EV3Manager";
     private static EV3Manager ev3Manager;
@@ -84,7 +84,7 @@ public class EV3Manager
 
     public void initialisePlugin()
     {
-        UnityPlayer.UnitySendMessage(scriptLocation, "throwAlertUpdate", "Initialising EV3 Plugin!");
+        UnityMessage.throwDebugUpdate("Initialising EV3 Plugin!");
 
         // Perform initial checks for bluetooth
 
@@ -106,15 +106,15 @@ public class EV3Manager
         if (bluetoothAdapter == null)
         {
             performCleanup();
-            showToast("This application requires a bluetooth capable device");
+            UnityMessage.throwToast(UnityMessage.StringID.bluetooth_required);
             return;
         }
 
-        // showToast("Bluetooth Adapter Found!");
+        UnityMessage.throwToast(UnityMessage.StringID.bluetooth_found);
 
         if (!bluetoothAdapter.isEnabled())
         {
-            UnityPlayer.UnitySendMessage(scriptLocation, "throwBluetoothAlert", "false");
+            UnityMessage.throwBluetoothConnected(false);
 
             if(autoEnableBT)
             {
@@ -136,20 +136,20 @@ public class EV3Manager
     {
         if(!bluetoothAdapter.isEnabled())
         {
-            showToast("Please enable bluetooth and try again!");
+            UnityMessage.throwBluetoothConnectionError(BluetoothConnection.ConnectionError.BluetoothNotEnabled);
+            UnityMessage.throwToast(UnityMessage.StringID.bluetooth_try_again);
             return;
         }
         else
         {
-            UnityPlayer.UnitySendMessage(scriptLocation, "throwBluetoothAlert", "true");
+            UnityMessage.throwBluetoothConnected(true);
         }
 
         // All checks are passed so lets begin the connection!
 
-        showToast("Initialising bluetooth connection!");
+         UnityMessage.throwToast(UnityMessage.StringID.bluetooth_init);
 
-        // Get the bluetooth devices which are paired
-        // with the system.
+        // Get the bluetooth devices which are paired with the system.
 
         ev3 = new Brick(this, deviceName);
         ev3.connect();
@@ -170,7 +170,7 @@ public class EV3Manager
         Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         activity.startActivityForResult(turnOn, 0);
 
-        UnityPlayer.UnitySendMessage(scriptLocation, "throwBluetoothAlert", "true");
+        UnityMessage.throwBluetoothConnected(true);
     }
 
     // endregion Initialisation & Bluetooth
@@ -233,11 +233,6 @@ public class EV3Manager
 
     // region Tools & Scripts
 
-    public void sendMessage(String event, String message)
-    {
-        UnityPlayer.UnitySendMessage(scriptLocation, event, message);
-    }
-
     public void showToast(final String message)
     {
         try
@@ -250,9 +245,24 @@ public class EV3Manager
         }
         catch (Exception ex)
         {
-            UnityPlayer.UnitySendMessage(scriptLocation, "throwAlertUpdate", "Error: " + ex.getMessage());
+            UnityMessage.throwDebugUpdate("Error: " + ex.getMessage());
         }
     }
 
     // endregion Tools & Scripts
+}
+
+interface UnityCalls
+{
+    // Methods called from the Unity app
+
+    void initialisePlugin();
+    void playProgram(String fileName);
+    void playAudio(int volume, String fileName);
+    void setLedPattern(String pattern);
+    void stopDriveMotors(String portL, String portR);
+    void startDriveMotors(String portL, String portR, int s1, int s2);
+    void setMotorPower(String port, int power);
+    void showToast(String message);
+    void setContext(Context activityContext);
 }

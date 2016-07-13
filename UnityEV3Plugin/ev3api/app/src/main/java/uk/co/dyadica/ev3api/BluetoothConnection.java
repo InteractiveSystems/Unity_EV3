@@ -22,6 +22,8 @@ import java.util.Set;
 public class BluetoothConnection extends Communication implements IConnected
 {
     private static final String TAG = "BluetoothConnection";
+    public static final String BASE_UUID = "00001101-0000-1000-8000-00805f9b34fb";
+
     public BluetoothAdapter bluetoothAdapter;
     public Set<BluetoothDevice> pairedDevices;
 
@@ -35,6 +37,19 @@ public class BluetoothConnection extends Communication implements IConnected
     private IDataReceived callback;
 
     private Brick brick;
+
+    private ConnectionError connectionError = ConnectionError.None;
+
+    enum ConnectionError
+    {
+        None,
+        BluetoothNotAvailable,
+        BluetoothNotEnabled,
+        NoPairedDevices,
+        DeviceNameNotFound,
+        SocketCreationFailed,
+        SocketConnectionFailed
+    }
 
     public BluetoothConnection(String deviceName, Brick brick)
     {
@@ -121,7 +136,7 @@ public class BluetoothConnection extends Communication implements IConnected
 
         // Inform the brick that we are setup and ready to go!
 
-        brick.bluetoothConnected();
+        brick.bluetoothConnected(true);
     }
 
     @Override
@@ -130,6 +145,12 @@ public class BluetoothConnection extends Communication implements IConnected
         // We have a timeout or null response so fail the connection!
 
         bluetoothSocket = null;
+
+        brick.bluetoothConnected(false);
+
+        Log.i(TAG, "throwBluetoothConnectionError " + connectionError.toString());
+
+        UnityMessage.throwBluetoothConnectionError(connectionError);
     }
 
     // endregion Communication
@@ -143,6 +164,7 @@ public class BluetoothConnection extends Communication implements IConnected
         @Override
         protected BluetoothSocket doInBackground(IConnected... params)
         {
+            connectionError = ConnectionError.None;
             callback = params[0];
 
             Log.i(TAG, "Opening Bluetooth Connection!");
@@ -154,7 +176,10 @@ public class BluetoothConnection extends Communication implements IConnected
             // If we have no bluetooth the return false
 
             if (bluetoothAdapter == null)
+            {
+                connectionError = ConnectionError.BluetoothNotAvailable;
                 return null;
+            }
 
             // Check for paired devices
 
@@ -165,7 +190,10 @@ public class BluetoothConnection extends Communication implements IConnected
             // If we have no paired devices then return false
 
             if (pairedDevices.size() <= 0)
+            {
+                connectionError = ConnectionError.NoPairedDevices;
                 return null;
+            }
 
             // Check to see if the named device exists
 
@@ -182,24 +210,27 @@ public class BluetoothConnection extends Communication implements IConnected
             // If the device has not been found then return false
 
             if(bluetoothDevice == null)
+            {
+                connectionError = ConnectionError.DeviceNameNotFound;
+                Log.i(TAG, "Device " + deviceName + " not known on this device!");
                 return null;
+            }
 
             Log.i(TAG, "The named device exists!");
 
             // Initialise the connection
             // Set the socket etc here!
 
-            String uuid = "00001101-0000-1000-8000-00805f9b34fb";
-
             BluetoothSocket tmpSocket;
 
             try
             {
                 // Use the Serial Port Profile
-                tmpSocket = bluetoothDevice.createRfcommSocketToServiceRecord(java.util.UUID.fromString(uuid));
+                tmpSocket = bluetoothDevice.createRfcommSocketToServiceRecord(java.util.UUID.fromString(BASE_UUID));
             }
             catch (IOException e)
             {
+                connectionError = ConnectionError.SocketCreationFailed;
                 Log.e(TAG, "Failed to create RfcommSocketToServiceRecord socket");
                 return null;
             }
@@ -212,6 +243,7 @@ public class BluetoothConnection extends Communication implements IConnected
             }
             catch (Exception ex)
             {
+                connectionError = ConnectionError.SocketConnectionFailed;
                 Log.w(TAG, "Failed to connect to socket!");
                 return null;
             }

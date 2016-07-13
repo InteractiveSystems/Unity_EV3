@@ -14,7 +14,7 @@ import android.bluetooth.BluetoothSocket;
 
 public interface IConnected
 {
-    public void connected(BluetoothSocket socket);
+    void connected(BluetoothSocket socket);
 
-    public void failed();
+    void failed();
 }
