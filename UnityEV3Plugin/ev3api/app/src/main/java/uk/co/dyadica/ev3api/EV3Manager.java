@@ -187,6 +187,16 @@ public class EV3Manager implements UnityCalls
         new ExecuteCommand(ev3, "play-program", fileName);
     }
 
+    public void stopProgram()
+    {
+        if(ev3 == null)
+            return;
+
+        Log.i(TAG, "Calling Stop program");
+
+        new ExecuteCommand(ev3, "stop-program");
+    }
+
     public void playAudio(int volume, String fileName)
     {
         if(ev3 == null)
@@ -257,6 +267,7 @@ interface UnityCalls
     // Methods called from the Unity app
 
     void initialisePlugin();
+    void stopProgram();
     void playProgram(String fileName);
     void playAudio(int volume, String fileName);
     void setLedPattern(String pattern);

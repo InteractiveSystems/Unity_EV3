@@ -55,6 +55,14 @@ public class ExecuteCommand extends AsyncTask<Void, Void, Void>
         this.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+    public ExecuteCommand(Brick ev3, String cmd)
+    {
+        this.ev3 = ev3;
+        this.command = cmd;
+
+        this.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
     public ExecuteCommand(Brick ev3, String cmd, String p1, int i1)
     {
         this.ev3 = ev3;
@@ -98,6 +106,8 @@ public class ExecuteCommand extends AsyncTask<Void, Void, Void>
         {
             case "play-program": playProgram();
                 break;
+            case "stop-program": stopProgram();
+                break;
             case "play-audio": playAudio();
                 break;
             case "set-led": setLedPattern();
@@ -123,6 +133,19 @@ public class ExecuteCommand extends AsyncTask<Void, Void, Void>
         catch (Exception ex)
         {
             Log.e(TAG, "Failed to start program: " + ex.getMessage());
+        }
+    }
+
+    public void stopProgram()
+    {
+        try
+        {
+            Log.i(TAG, "Stopping program...");
+            ev3.directCommand.stopProgram();
+        }
+        catch (Exception ex)
+        {
+            Log.e(TAG, "Failed to stop program: " + ex.getMessage());
         }
     }
 
